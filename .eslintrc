@@ -1,0 +1,39 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "plugins": ["jest", "prettier"],
+  "extends": [
+    "airbnb",
+    "airbnb-typescript/base"
+  ],
+  "settings": {
+    "react": {
+      "version" : "999.999.999" //To avoid https://github.com/jsx-eslint/eslint-plugin-react/issues/1955, as we are not using React
+    }
+  },
+  "ignorePatterns": [],
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "MemberExpression > Identifier[name='exports']",
+        "message": "'exports' keyword is not permitted. Please use es6 syntax instead. Example : export const <nameofConstant>"
+      }
+    ],
+    "import/prefer-default-export": 0,
+    "no-new": 0,
+    "radix": 0,
+    "max-len": ["error", {
+      "code": 140
+    }]
+  }
+}
