@@ -1,0 +1,13 @@
+{
+    "json.schemaDownload.enable": true,
+    "files.eol": "\n",
+    "git.confirmSync": false,
+    "window.zoomLevel": 0,
+    "workbench.activityBar.visible": true,
+    "eslint.format.enable": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
+}
