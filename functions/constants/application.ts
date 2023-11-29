@@ -1,18 +1,18 @@
 export enum AppConstants {
-    StackName = 'serverless-internship-nkabasaj',
+  StackName = 'serverless-internship-nkabasaj',
 
-    UserPoolName = 'user-pool',
-    AppClientName = 'instagram-app-client',
-    
-    RestApiName = 'serverless-internship-nkabasaj-rest-api',
-    RestApiDescription = 'Instagram REST API',
+  UserPoolName = 'user-pool',
+  AppClientName = 'instagram-app-client',
 
-    PostS3BucketName = 'instagram-post-images',
+  RestApiName = 'serverless-internship-nkabasaj-rest-api',
+  RestApiDescription = 'Instagram REST API',
 
-    TablePrimaryKeyName = 'id',
-    UserTableName = 'user',
-    FollowTableName = 'follow',
-    PostTableName = 'post',
-    CommentTableName = 'comment'
+  PostS3BucketName = 'instagram-post-images',
+
+  TablePrimaryKeyName = 'id',
+  UserTableName = 'user',
+  FollowTableName = 'follow',
+  PostTableName = 'post',
+  CommentTableName = 'comment',
 
 }

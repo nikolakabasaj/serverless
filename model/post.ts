@@ -1,36 +1,41 @@
-import { BaseEntity } from "./base-entity";
+import { BaseEntity } from './base-entity';
 
 export class Post extends BaseEntity {
-    public userId: string;
-    private imageLocation: any;
-    public likes: number;
-    private dislikes: number;
-    private description: string;
-    private comments: string[];
-    
-    constructor(userId: string, description: string, imageLocation?: any ) {
-        super();
-        this.userId = userId;
-        this.imageLocation = imageLocation;
-        this.likes = 0;
-        this.dislikes = 0;
-        this.description = description;
-        this.comments = [];
-    }
+  public userId: string;
 
-    public getImageKey() {
-        return `post/${Date.now().toString()}#${this.id}`;
-    }
+  private imageLocation: any;
 
-    public getUserId() {
-        return this.userId;
-    }
+  public likes: number;
 
-    public setImageLocation(imageLocation: any) {
-        this.imageLocation = imageLocation;
-    }
+  private dislikes: number;
 
-    public likePost() {
-        this.likes++;
-    }
+  private description: string;
+
+  private comments: string[];
+
+  constructor(userId: string, description: string, imageLocation?: any) {
+    super();
+    this.userId = userId;
+    this.imageLocation = imageLocation;
+    this.likes = 0;
+    this.dislikes = 0;
+    this.description = description;
+    this.comments = [];
+  }
+
+  public getImageKey() {
+    return `post/${Date.now().toString()}#${this.id}`;
+  }
+
+  public getUserId() {
+    return this.userId;
+  }
+
+  public setImageLocation(imageLocation: any) {
+    this.imageLocation = imageLocation;
+  }
+
+  public likePost() {
+    this.likes++;
+  }
 }

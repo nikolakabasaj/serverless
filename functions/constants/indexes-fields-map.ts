@@ -1,4 +1,4 @@
-import { Indexes } from "./indexes";
+import { Indexes } from './indexes';
 
 export const INDEX_FIELDS_MAP: Map<string, string[]> = new Map([
   // follow

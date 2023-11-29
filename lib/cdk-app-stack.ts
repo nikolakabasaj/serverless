@@ -12,19 +12,21 @@ export class CdkAppStack extends cdk.Stack {
 
     const { userPoolId, userPoolClientId } = new CognitoUserPool(this, id, AppConstants.UserPoolName);
 
-	const postS3Bucket = new S3Bucket(this, id, AppConstants.PostS3BucketName);
+    const postS3Bucket = new S3Bucket(this, id, AppConstants.PostS3BucketName);
 
-	const userDynamoDBTable = new DynamoDB(this, id, AppConstants.UserTableName);
-	const followDynamoDBTable = new DynamoDB(this, id, AppConstants.FollowTableName);
-	const postDynamoDBTable = new DynamoDB(this, id, AppConstants.PostTableName);
-	const commentDynamoDBTable = new DynamoDB(this, id, AppConstants.CommentTableName);
-	const dynamoDBTables = { userTable: userDynamoDBTable, followTable: followDynamoDBTable, postTable: postDynamoDBTable, commentTable: commentDynamoDBTable };
+    const userDynamoDBTable = new DynamoDB(this, id, AppConstants.UserTableName);
+    const followDynamoDBTable = new DynamoDB(this, id, AppConstants.FollowTableName);
+    const postDynamoDBTable = new DynamoDB(this, id, AppConstants.PostTableName);
+    const commentDynamoDBTable = new DynamoDB(this, id, AppConstants.CommentTableName);
+    const dynamoDBTables = {
+      userTable: userDynamoDBTable, followTable: followDynamoDBTable, postTable: postDynamoDBTable, commentTable: commentDynamoDBTable,
+    };
 
-	new InstagramAPI(this, {
-		userPoolId,
-		userPoolClientId,
-		postS3Bucket,
-		dynamoDBTables
-	});
+    new InstagramAPI(this, {
+      userPoolId,
+      userPoolClientId,
+      postS3Bucket,
+      dynamoDBTables,
+    });
   }
 }

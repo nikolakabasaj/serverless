@@ -1,7 +1,7 @@
 export class AuditableEntity {
-    public createdAt: string;
+  public createdAt: string;
 
-    constructor() {
-        this.createdAt = new Date().toISOString();
-    }
+  constructor() {
+    this.createdAt = new Date().toISOString();
+  }
 }
