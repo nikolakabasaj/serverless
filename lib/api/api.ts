@@ -1,9 +1,20 @@
 import {
-  Cors, EndpointType, IResource, LambdaIntegration, RestApi, TokenAuthorizer,
+  Cors,
+  EndpointType,
+  IResource,
+  LambdaIntegration,
+  RestApi,
+  TokenAuthorizer,
 } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { createLambdaIntegrationOptions, createTokenAuthorizer } from '../../functions/utils/token/token-authorizer-factory';
-import { createFn, createFnProps } from '../../functions/utils/lambda-function-util';
+import {
+  createLambdaIntegrationOptions,
+  createTokenAuthorizer,
+} from '../../functions/utils/token/token-authorizer-factory';
+import {
+  createFn,
+  createFnProps,
+} from '../../functions/utils/lambda-function-util';
 import { createPolicyStatement } from '../../functions/utils/policy-factory';
 import { HTTPMethod } from '../../functions/constants/http';
 import { AppConstants } from '../../functions/constants/application';
@@ -13,10 +24,10 @@ import { S3Bucket } from '../s3/s3-bucket';
 import { INDEX_FIELDS_MAP } from '../../functions/constants/indexes-fields-map';
 
 type ApiProps = {
-  userPoolId: string,
-  userPoolClientId: string,
-  postS3Bucket: S3Bucket
-  dynamoDBTables: DynamoDBTables
+  userPoolId: string;
+  userPoolClientId: string;
+  postS3Bucket: S3Bucket;
+  dynamoDBTables: DynamoDBTables;
 };
 
 type DynamoDBTables = {
@@ -39,7 +50,7 @@ class ResourceData {
     resourceName: string,
     method: string,
     resource: IResource,
-    isResourceProtected = true,
+    isResourceProtected = true
   ) {
     this.resourceName = resourceName;
     this.method = method;
@@ -86,10 +97,10 @@ export class InstagramAPI extends Construct {
 
   private initializeProps(props: ApiProps) {
     this.apiProps = props;
-    this.tokenAuthorizer = createTokenAuthorizer(this, {
-      userPoolId: this.apiProps.userPoolId,
-      userPoolClientId: this.apiProps.userPoolClientId,
-    });
+    // this.tokenAuthorizer = createTokenAuthorizer(this, {
+    //   userPoolId: this.apiProps.userPoolId,
+    //   userPoolClientId: this.apiProps.userPoolClientId,
+    // });
   }
 
   private setUpRoutes(api: RestApi) {
@@ -107,46 +118,116 @@ export class InstagramAPI extends Construct {
     this.createSecondaryIndexes();
 
     // auth
-    this.addRoute(new ResourceData('signout', HTTPMethod.GET, this.authResource, false), functions.signOutFn);
-    this.addRoute(new ResourceData('signup', HTTPMethod.POST, this.authResource, false), functions.signupFn);
-    this.addRoute(new ResourceData('signin', HTTPMethod.POST, this.authResource, false), functions.signinFn);
-    this.addRoute(new ResourceData('confirm-signup', HTTPMethod.POST, this.authResource, false), functions.confirmSignupFn);
+    this.addRoute(
+      new ResourceData('signout', HTTPMethod.GET, this.authResource, false),
+      functions.signOutFn
+    );
+    this.addRoute(
+      new ResourceData('signup', HTTPMethod.POST, this.authResource, false),
+      functions.signupFn
+    );
+    this.addRoute(
+      new ResourceData('signin', HTTPMethod.POST, this.authResource, false),
+      functions.signinFn
+    );
+    this.addRoute(
+      new ResourceData(
+        'confirm-signup',
+        HTTPMethod.POST,
+        this.authResource,
+        false
+      ),
+      functions.confirmSignupFn
+    );
 
     // user
-    this.addRoute(new ResourceData('all', HTTPMethod.GET, this.userResource), functions.getAllUsersFn);
-    this.addRoute(new ResourceData('current', HTTPMethod.GET, this.userResource), functions.getCurrentlyLoggedUserFn);
-    this.addRoute(new ResourceData('add', HTTPMethod.POST, this.userResource), functions.createUserFn);
+    this.addRoute(
+      new ResourceData('all', HTTPMethod.GET, this.userResource, false), // needs to be protected, delete false
+      functions.getAllUsersFn
+    );
+    this.addRoute(
+      new ResourceData('current', HTTPMethod.GET, this.userResource, false), // needs to be protected, delete false
+      functions.getCurrentlyLoggedUserFn
+    );
+    this.addRoute(
+      new ResourceData('add', HTTPMethod.POST, this.userResource, false), // needs to be protected, delete false
+      functions.createUserFn
+    );
 
     // follow
-    this.addRoute(new ResourceData('followers', HTTPMethod.GET, api.root), functions.getAllfollowersFn);
-    this.addRoute(new ResourceData('followings', HTTPMethod.GET, api.root), functions.getAllfollowingsFn);
-    this.addRoute(new ResourceData('follow', HTTPMethod.POST, this.singleUserResource), functions.followUserFn);
-    this.addRoute(new ResourceData('unfollow', HTTPMethod.POST, this.singleUserResource), functions.unfollowUserFn);
+    this.addRoute(
+      new ResourceData('followers', HTTPMethod.GET, api.root, false), // needs to be protected, delete false
+      functions.getAllfollowersFn
+    );
+    this.addRoute(
+      new ResourceData('followings', HTTPMethod.GET, api.root, false), // needs to be protected, delete false
+      functions.getAllfollowingsFn
+    );
+    this.addRoute(
+      new ResourceData('follow', HTTPMethod.POST, this.singleUserResource, false), // needs to be protected, delete false
+      functions.followUserFn
+    );
+    this.addRoute(
+      new ResourceData('unfollow', HTTPMethod.POST, this.singleUserResource, false), // needs to be protected, delete false
+      functions.unfollowUserFn
+    );
 
     // post
-    this.addRoute(new ResourceData('', HTTPMethod.GET, this.postResource), functions.getPostsForCurrentUserFn);
-    this.addRoute(new ResourceData('', HTTPMethod.GET, this.feedResource), functions.getFeedFn);
-    this.addRoute(new ResourceData('', HTTPMethod.POST, this.postResource), functions.createPostFn);
-    this.addRoute(new ResourceData('like', HTTPMethod.POST, this.singlePostResource), functions.likePostFn);
-    this.addRoute(new ResourceData('', HTTPMethod.PUT, this.singlePostResource), functions.updatePostFn);
-    this.addRoute(new ResourceData('', HTTPMethod.DELETE, this.singlePostResource), functions.deletePostFn);
+    this.addRoute(
+      new ResourceData('', HTTPMethod.GET, this.postResource, false), // needs to be protected, delete false
+      functions.getPostsForCurrentUserFn
+    );
+    this.addRoute(
+      new ResourceData('', HTTPMethod.GET, this.feedResource, false), // needs to be protected, delete false
+      functions.getFeedFn
+    );
+    this.addRoute(
+      new ResourceData('', HTTPMethod.POST, this.postResource, false), // needs to be protected, delete false
+      functions.createPostFn
+    );
+    this.addRoute(
+      new ResourceData('like', HTTPMethod.POST, this.singlePostResource, false), // needs to be protected, delete false
+      functions.likePostFn
+    );
+    this.addRoute(
+      new ResourceData('', HTTPMethod.PUT, this.singlePostResource, false), // needs to be protected, delete false
+      functions.updatePostFn
+    );
+    this.addRoute(
+      new ResourceData('', HTTPMethod.DELETE, this.singlePostResource, false), // needs to be protected, delete false
+      functions.deletePostFn
+    );
 
     // comment
-    this.addRoute(new ResourceData('comment', HTTPMethod.POST, this.singlePostResource), functions.commentPostFn);
+    this.addRoute(
+      new ResourceData('comment', HTTPMethod.POST, this.singlePostResource, false), // needs to be protected, delete false
+      functions.commentPostFn
+    );
   }
 
   private addRoute(
     resourceData: ResourceData,
     fn: any,
-    actions?: string,
+    actions?: string
   ): void {
-    const newResource = resourceData.resourceName === '' ? resourceData.resource : resourceData.resource.addResource(resourceData.resourceName);
+    const newResource =
+      resourceData.resourceName === ''
+        ? resourceData.resource
+        : resourceData.resource.addResource(resourceData.resourceName);
     if (actions) {
-      fn.addToRolePolicy(createPolicyStatement(this.apiProps.userPoolId, actions));
+      fn.addToRolePolicy(
+        createPolicyStatement(this.apiProps.userPoolId, actions)
+      );
     }
 
-    const options = resourceData.isResourceProtected ? createLambdaIntegrationOptions(this.tokenAuthorizer) : undefined;
-    newResource.addMethod(resourceData.method, new LambdaIntegration(fn), options);
+    const options = resourceData.isResourceProtected
+      ? createLambdaIntegrationOptions(this.tokenAuthorizer)
+      : undefined;
+    newResource.addMethod(
+      resourceData.method,
+      new LambdaIntegration(fn),
+      options
+    );
   }
 
   private createRouteFunctions() {
@@ -158,43 +239,151 @@ export class InstagramAPI extends Construct {
     const postEntry = `${baseEntry}/post`;
 
     // fn props
-    const cognitoProps = createFnProps({ USER_POOL_ID: this.apiProps.userPoolId, CLIENT_ID: this.apiProps.userPoolClientId });
-    const userDynamoDbProps = createFnProps({ USER_TABLE_NAME: this.getUserTable().getTableName() });
-    const userCognitoDynamoProps = createFnProps({ USER_POOL_ID: this.apiProps.userPoolId, CLIENT_ID: this.apiProps.userPoolClientId, USER_TABLE_NAME: this.getUserTable().getTableName() });
-    const followProps = createFnProps({ FOLLOW_TABLE_NAME: this.getFollowTable().getTableName(), USER_TABLE_NAME: this.getUserTable().getTableName() });
-    const postProps = createFnProps({
-      POST_TABLE_NAME: this.getPostTable().getTableName(), POST_S3_BUCKET_NAME: this.getPostS3Bucket().getBucketName(), FOLLOW_TABLE_NAME: this.getFollowTable().getTableName(), USER_TABLE_NAME: this.getUserTable().getTableName(), COMMENT_TABLE_NAME: this.getCommentTable().getTableName(),
+    const cognitoProps = createFnProps({
+      USER_POOL_ID: this.apiProps.userPoolId,
+      CLIENT_ID: this.apiProps.userPoolClientId,
     });
-    const commentProps = createFnProps({ COMMENT_TABLE_NAME: this.getCommentTable().getTableName() });
+    const userDynamoDbProps = createFnProps({
+      USER_TABLE_NAME: this.getUserTable().getTableName(),
+    });
+    const userCognitoDynamoProps = createFnProps({
+      USER_POOL_ID: this.apiProps.userPoolId,
+      CLIENT_ID: this.apiProps.userPoolClientId,
+      USER_TABLE_NAME: this.getUserTable().getTableName(),
+    });
+    const followProps = createFnProps({
+      FOLLOW_TABLE_NAME: this.getFollowTable().getTableName(),
+      USER_TABLE_NAME: this.getUserTable().getTableName(),
+    });
+    const postProps = createFnProps({
+      POST_TABLE_NAME: this.getPostTable().getTableName(),
+      POST_S3_BUCKET_NAME: this.getPostS3Bucket().getBucketName(),
+      FOLLOW_TABLE_NAME: this.getFollowTable().getTableName(),
+      USER_TABLE_NAME: this.getUserTable().getTableName(),
+      COMMENT_TABLE_NAME: this.getCommentTable().getTableName(),
+    });
+    const commentProps = createFnProps({
+      COMMENT_TABLE_NAME: this.getCommentTable().getTableName(),
+    });
 
     // fn
     // auth
-    const signOutFn = createFn(this, 'SignoutFn', `${authEntry}/signout.ts`, cognitoProps);
-    const signupFn = createFn(this, 'SignupFn', `${authEntry}/signup.ts`, userCognitoDynamoProps);
-    const signinFn = createFn(this, 'SigninFn', `${authEntry}/signin.ts`, cognitoProps);
-    const confirmSignupFn = createFn(this, 'ConfirmFn', `${authEntry}/confirm-signup.ts`, cognitoProps);
+    const signOutFn = createFn(
+      this,
+      'SignoutFn',
+      `${authEntry}/signout.ts`,
+      cognitoProps
+    );
+    const signupFn = createFn(
+      this,
+      'SignupFn',
+      `${authEntry}/signup.ts`,
+      userCognitoDynamoProps
+    );
+    const signinFn = createFn(
+      this,
+      'SigninFn',
+      `${authEntry}/signin.ts`,
+      cognitoProps
+    );
+    const confirmSignupFn = createFn(
+      this,
+      'ConfirmFn',
+      `${authEntry}/confirm-signup.ts`,
+      cognitoProps
+    );
 
     // user
-    const createUserFn = createFn(this, 'CreateUserFn', `${userEntry}/create-user.ts`, userDynamoDbProps);
-    const getAllUsersFn = createFn(this, 'GetAllUsersFn', `${userEntry}/get-all.ts`, userDynamoDbProps);
-    const getCurrentlyLoggedUserFn = createFn(this, 'GetCurrentlyLoggedUserFn', `${userEntry}/get-current-user.ts`, userDynamoDbProps);
+    const createUserFn = createFn(
+      this,
+      'CreateUserFn',
+      `${userEntry}/create-user.ts`,
+      userDynamoDbProps
+    );
+    const getAllUsersFn = createFn(
+      this,
+      'GetAllUsersFn',
+      `${userEntry}/get-all.ts`,
+      userDynamoDbProps
+    );
+    const getCurrentlyLoggedUserFn = createFn(
+      this,
+      'GetCurrentlyLoggedUserFn',
+      `${userEntry}/get-current-user.ts`,
+      userDynamoDbProps
+    );
 
     // follow
-    const followUserFn = createFn(this, 'FollowUserFn', `${followEntry}/follow.ts`, followProps);
-    const unfollowUserFn = createFn(this, 'UnfollowUserFn', `${followEntry}/unfollow.ts`, followProps);
-    const getAllfollowersFn = createFn(this, 'GetAllFollowersFn', `${followEntry}/get-all-followers.ts`, followProps);
-    const getAllfollowingsFn = createFn(this, 'GetAllFollowingsFn', `${followEntry}/get-all-followings.ts`, followProps);
+    const followUserFn = createFn(
+      this,
+      'FollowUserFn',
+      `${followEntry}/follow.ts`,
+      followProps
+    );
+    const unfollowUserFn = createFn(
+      this,
+      'UnfollowUserFn',
+      `${followEntry}/unfollow.ts`,
+      followProps
+    );
+    const getAllfollowersFn = createFn(
+      this,
+      'GetAllFollowersFn',
+      `${followEntry}/get-all-followers.ts`,
+      followProps
+    );
+    const getAllfollowingsFn = createFn(
+      this,
+      'GetAllFollowingsFn',
+      `${followEntry}/get-all-followings.ts`,
+      followProps
+    );
 
     // post
-    const createPostFn = createFn(this, 'CreatePostFn', `${postEntry}/create-post.ts`, postProps);
-    const likePostFn = createFn(this, 'LikePostFn', `${postEntry}/like-post.ts`, postProps);
-    const getPostsForCurrentUserFn = createFn(this, 'GetPostsForCurrentUserFn', `${postEntry}/get-all-current-user-posts.ts`, postProps);
-    const getFeedFn = createFn(this, 'GetFeedFn', `${postEntry}/get-feed.ts`, postProps);
-    const updatePostFn = createFn(this, 'UpdatePostFn', `${postEntry}/update-post.ts`, postProps);
-    const deletePostFn = createFn(this, 'DeletePostFn', `${postEntry}/delete-post.ts`, postProps);
+    const createPostFn = createFn(
+      this,
+      'CreatePostFn',
+      `${postEntry}/create-post.ts`,
+      postProps
+    );
+    const likePostFn = createFn(
+      this,
+      'LikePostFn',
+      `${postEntry}/like-post.ts`,
+      postProps
+    );
+    const getPostsForCurrentUserFn = createFn(
+      this,
+      'GetPostsForCurrentUserFn',
+      `${postEntry}/get-all-current-user-posts.ts`,
+      postProps
+    );
+    const getFeedFn = createFn(
+      this,
+      'GetFeedFn',
+      `${postEntry}/get-feed.ts`,
+      postProps
+    );
+    const updatePostFn = createFn(
+      this,
+      'UpdatePostFn',
+      `${postEntry}/update-post.ts`,
+      postProps
+    );
+    const deletePostFn = createFn(
+      this,
+      'DeletePostFn',
+      `${postEntry}/delete-post.ts`,
+      postProps
+    );
 
     // comment
-    const commentPostFn = createFn(this, 'CommmentPostFn', `${postEntry}/comment-post.ts`, commentProps);
+    const commentPostFn = createFn(
+      this,
+      'CommmentPostFn',
+      `${postEntry}/comment-post.ts`,
+      commentProps
+    );
 
     return {
       // auth
@@ -220,7 +409,6 @@ export class InstagramAPI extends Construct {
       deletePostFn,
       // comment
       commentPostFn,
-
     };
   }
 
@@ -260,20 +448,42 @@ export class InstagramAPI extends Construct {
   }
 
   private createSecondaryIndexes() {
-    this.getFollowTable().addGlobalSecondaryIndex(Indexes.FollowedIdIndex, INDEX_FIELDS_MAP.get(Indexes.FollowedIdIndex)!);
-    this.getFollowTable().addGlobalSecondaryIndex(Indexes.FollowerIdIndex, INDEX_FIELDS_MAP.get(Indexes.FollowerIdIndex)!);
-    this.getFollowTable().addGlobalSecondaryIndex(Indexes.FollowerAndFollowedIdIndex, INDEX_FIELDS_MAP.get(Indexes.FollowerAndFollowedIdIndex)!);
+    this.getFollowTable().addGlobalSecondaryIndex(
+      Indexes.FollowedIdIndex,
+      INDEX_FIELDS_MAP.get(Indexes.FollowedIdIndex)!
+    );
+    this.getFollowTable().addGlobalSecondaryIndex(
+      Indexes.FollowerIdIndex,
+      INDEX_FIELDS_MAP.get(Indexes.FollowerIdIndex)!
+    );
+    this.getFollowTable().addGlobalSecondaryIndex(
+      Indexes.FollowerAndFollowedIdIndex,
+      INDEX_FIELDS_MAP.get(Indexes.FollowerAndFollowedIdIndex)!
+    );
 
-    this.getPostTable().addGlobalSecondaryIndex(Indexes.PostUserIdIndex, INDEX_FIELDS_MAP.get(Indexes.PostUserIdIndex)!);
+    this.getPostTable().addGlobalSecondaryIndex(
+      Indexes.PostUserIdIndex,
+      INDEX_FIELDS_MAP.get(Indexes.PostUserIdIndex)!
+    );
   }
 
-  private getUserTable() { return this.apiProps.dynamoDBTables.userTable; }
+  private getUserTable() {
+    return this.apiProps.dynamoDBTables.userTable;
+  }
 
-  private getFollowTable() { return this.apiProps.dynamoDBTables.followTable; }
+  private getFollowTable() {
+    return this.apiProps.dynamoDBTables.followTable;
+  }
 
-  private getPostTable() { return this.apiProps.dynamoDBTables.postTable; }
+  private getPostTable() {
+    return this.apiProps.dynamoDBTables.postTable;
+  }
 
-  private getCommentTable() { return this.apiProps.dynamoDBTables.commentTable; }
+  private getCommentTable() {
+    return this.apiProps.dynamoDBTables.commentTable;
+  }
 
-  private getPostS3Bucket() { return this.apiProps.postS3Bucket; }
+  private getPostS3Bucket() {
+    return this.apiProps.postS3Bucket;
+  }
 }

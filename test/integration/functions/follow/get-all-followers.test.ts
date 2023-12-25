@@ -1,15 +1,22 @@
-import {HttpStatusCode} from 'axios';
+import {handler} from '../../../../functions/follower/get-all-followers';
 import * as db from '../../../../functions/db/db-operations';
-import {handler} from '../../../../functions/follow/get-all-followers';
 import * as eventParser from '../../../../functions/utils/event-parser';
-import {Follow} from '../../../../model/follow';
+import {HttpStatusCode} from 'axios';
 
-jest.mock('../../../../functions/utils/event-parser');
-jest.mock('../../../../functions/db/db-operations');
-jest.mock('../../../../functions/constants/indexes-fields');
-jest.mock('../../../../functions/constants/indexes');
+const FOLLOW_TABLE_NAME = 'mockFollowTable';
+const USER_TABLE_NAME = 'mockUserTable';
 
-describe('Get All Followers Handler', () => {
+describe('Get All Followers Integration Test', () => {
+  beforeAll(() => {
+    process.env.FOLLOW_TABLE_NAME = FOLLOW_TABLE_NAME;
+    process.env.USER_TABLE_NAME = USER_TABLE_NAME;
+  });
+
+  afterAll(() => {
+    delete process.env.FOLLOW_TABLE_NAME;
+    delete process.env.USER_TABLE_NAME;
+  });
+
   it('should return all followers when there are followers', async () => {
     // Arrange
     const currentUserId = '123';
@@ -21,6 +28,7 @@ describe('Get All Followers Handler', () => {
       {id: '2', username: 'follower2', email: 'follower2@example.com'},
     ];
 
+    // Mock the eventParser and db functions
     jest
       .spyOn(eventParser, 'getAuthorizedUserId')
       .mockReturnValue(currentUserId);
@@ -40,8 +48,9 @@ describe('Get All Followers Handler', () => {
   it('should return an error message when there are no followers', async () => {
     // Arrange
     const currentUserId = '123';
-    const emptyFollows: Follow[] = [];
+    const emptyFollows = [];
 
+    // Mock the eventParser and db functions
     jest
       .spyOn(eventParser, 'getAuthorizedUserId')
       .mockReturnValue(currentUserId);

@@ -1,7 +1,7 @@
-import { APIGatewayProxyResult } from 'aws-lambda';
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
-import { HttpStatusCode } from 'axios';
-import { httpResponse } from '../utils/http/http-response';
+import {APIGatewayProxyResult} from 'aws-lambda';
+import {CognitoIdentityServiceProvider} from 'aws-sdk';
+import {HttpStatusCode} from 'axios';
+import {httpResponse} from '../utils/http/http-response';
 
 const cognito = new CognitoIdentityServiceProvider();
 

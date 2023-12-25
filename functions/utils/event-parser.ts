@@ -1,4 +1,4 @@
-import { decodeToken } from './token/jwt-token-decoder';
+import {decodeToken} from './token/jwt-token-decoder';
 
 export function getAuthorizedUserId(event: any = {}) {
   const decodedToken = decodeToken(event.headers.Authorization);

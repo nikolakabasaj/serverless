@@ -1,9 +1,9 @@
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { off } from 'process';
-import { Kendra } from 'aws-sdk';
-import { AppConstants } from '../../functions/constants/application';
+import {Construct} from 'constructs';
+import {off} from 'process';
+import {Kendra} from 'aws-sdk';
+import {AppConstants} from '../../functions/constants/application';
 
 export class DynamoDB extends Construct {
   public readonly dynamoDbTable: dynamodb.Table;
@@ -12,7 +12,10 @@ export class DynamoDB extends Construct {
     const constructName = `${stackId}-${name}`;
     super(scope, constructName);
     this.dynamoDbTable = new dynamodb.Table(this, constructName, {
-      partitionKey: { name: AppConstants.TablePrimaryKeyName, type: dynamodb.AttributeType.STRING },
+      partitionKey: {
+        name: AppConstants.TablePrimaryKeyName,
+        type: dynamodb.AttributeType.STRING,
+      },
       readCapacity: 1,
       writeCapacity: 1,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -45,22 +48,33 @@ export class DynamoDB extends Construct {
     if (keys.length === 1) {
       return this.getSecondaryIndexWithPartiotionKey(indexName, keys[0]);
     }
-    return this.getSecondaryIndexWithPartiotionAndSortKey(indexName, keys[0], keys[1]);
+    return this.getSecondaryIndexWithPartiotionAndSortKey(
+      indexName,
+      keys[0],
+      keys[1]
+    );
   }
 
-  private getSecondaryIndexWithPartiotionKey(indexName: string, partitionKey: string) {
+  private getSecondaryIndexWithPartiotionKey(
+    indexName: string,
+    partitionKey: string
+  ) {
     return {
       indexName,
-      partitionKey: { name: partitionKey, type: dynamodb.AttributeType.STRING },
+      partitionKey: {name: partitionKey, type: dynamodb.AttributeType.STRING},
       projectionType: dynamodb.ProjectionType.ALL,
     };
   }
 
-  private getSecondaryIndexWithPartiotionAndSortKey(indexName: string, partitionKey: string, sortKey: string) {
+  private getSecondaryIndexWithPartiotionAndSortKey(
+    indexName: string,
+    partitionKey: string,
+    sortKey: string
+  ) {
     return {
       indexName,
-      partitionKey: { name: partitionKey, type: dynamodb.AttributeType.STRING },
-      sortKey: { name: sortKey, type: dynamodb.AttributeType.STRING },
+      partitionKey: {name: partitionKey, type: dynamodb.AttributeType.STRING},
+      sortKey: {name: sortKey, type: dynamodb.AttributeType.STRING},
       projectionType: dynamodb.ProjectionType.ALL,
     };
   }
