@@ -9,3 +9,4 @@ cdk.out
 
 !lambda/*.js
 !.prettierrc.js
+!test/k6/**
