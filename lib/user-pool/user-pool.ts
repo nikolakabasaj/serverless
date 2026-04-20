@@ -6,8 +6,12 @@ import {
   ClientAttributes,
   UserPoolClientIdentityProvider,
   UserPoolClientProps,
+  UserPoolOperation,
 } from 'aws-cdk-lib/aws-cognito';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
+import * as path from 'path';
 import { AppConstants } from '../../functions/constants/application';
 
 export class CognitoUserPool extends Construct {
@@ -84,6 +88,13 @@ export class CognitoUserPool extends Construct {
     };
 
     const appClient = userPool.addClient(AppConstants.AppClientName, userPoolClientProps);
+
+    const preSignUpFn = new NodejsFunction(this, 'pre-signup', {
+      runtime: Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '../../functions/auth/pre-signup.ts'),
+    });
+    userPool.addTrigger(UserPoolOperation.PRE_SIGN_UP, preSignUpFn);
 
     this.userPoolId = userPool.userPoolId;
     this.userPoolClientId = appClient.userPoolClientId;

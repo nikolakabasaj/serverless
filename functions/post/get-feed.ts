@@ -14,13 +14,15 @@ export async function handler(event: any = {}) : Promise <any> {
   const currentUserId = getAuthorizedUserId(event);
 
   const followingIds = await getFollowingIds(currentUserId);
-
-  const allPosts: Post[] = await db.getAll(POST_TABLE_NAME) as Post[];
-  if (allPosts.length === 0) {
-    return httpResponse(HttpStatusCode.InternalServerError, 'There are no posts');
+  if (followingIds.length === 0) {
+    return httpResponse(HttpStatusCode.Ok, 'All posts fetched', []);
   }
 
-  const followersPosts = allPosts.filter((post) => followingIds.includes(post.userId));
+  const postArrays = await Promise.all(
+    followingIds.map((id) => db.getByMultipleFields(POST_TABLE_NAME, Indexes.PostUserIdIndex, new PostUserIdIndexFields(id))),
+  );
+  const followersPosts: Post[] = ([] as Post[]).concat(...postArrays);
+
   return httpResponse(HttpStatusCode.Ok, 'All posts fetched', followersPosts);
 }
 

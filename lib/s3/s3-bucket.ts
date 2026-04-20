@@ -9,7 +9,6 @@ export class S3Bucket extends Construct {
     const constructName = `${stackId}-${name}`;
     super(scope, constructName);
     this.s3Bucket = new s3.Bucket(this, constructName, {
-      bucketName: constructName,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }

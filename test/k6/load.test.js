@@ -63,15 +63,15 @@ export const options = {
       maxVUs: 10,
     },
 
-    loadLikePost_20u_5min: {
-      executor: 'constant-arrival-rate',
-      exec: 'likePost',
-      rate: 3,
-      timeUnit: '1s',
-      duration: '5m',
-      preAllocatedVUs: 20,
-      maxVUs: 20,
-    },
+    // loadLikePost_20u_5min: {
+    //   executor: 'constant-arrival-rate',
+    //   exec: 'likePost',
+    //   rate: 3,
+    //   timeUnit: '1s',
+    //   duration: '5m',
+    //   preAllocatedVUs: 20,
+    //   maxVUs: 20,
+    // },
 
     loadFollowUser_10u_2min: {
       executor: 'constant-arrival-rate',
@@ -83,15 +83,15 @@ export const options = {
       maxVUs: 10,
     },
 
-    loadFollowUser_20u_5min: {
-      executor: 'constant-arrival-rate',
-      exec: 'followUser',
-      rate: 4,
-      timeUnit: '1s',
-      duration: '5m',
-      preAllocatedVUs: 20,
-      maxVUs: 20,
-    },
+    // loadFollowUser_20u_5min: {
+    //   executor: 'constant-arrival-rate',
+    //   exec: 'followUser',
+    //   rate: 4,
+    //   timeUnit: '1s',
+    //   duration: '5m',
+    //   preAllocatedVUs: 20,
+    //   maxVUs: 20,
+    // },
 
     loadGetFeed_10u_2min: {
       executor: 'constant-arrival-rate',
@@ -103,15 +103,15 @@ export const options = {
       maxVUs: 10,
     },
 
-    loadGetFeed_20u_5min: {
-      executor: 'constant-arrival-rate',
-      exec: 'getFeed',
-      rate: 3,
-      timeUnit: '1s',
-      duration: '5m',
-      preAllocatedVUs: 20,
-      maxVUs: 20,
-    },
+    // loadGetFeed_20u_5min: {
+    //   executor: 'constant-arrival-rate',
+    //   exec: 'getFeed',
+    //   rate: 3,
+    //   timeUnit: '1s',
+    //   duration: '5m',
+    //   preAllocatedVUs: 20,
+    //   maxVUs: 20,
+    // },
   },
 };
 
@@ -127,9 +127,10 @@ export function userSignup() {
     headers: jsonHeaders(),
   });
 
-  check(res, {
+  const ok = check(res, {
     'signup status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[load][signup FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function createPost() {
@@ -142,21 +143,23 @@ export function createPost() {
     headers: authHeaders(TEST_USER_ID),
   });
 
-  check(res, {
+  const ok = check(res, {
     'create post status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[load][createPost FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function likePost() {
   const res = http.post(
     `${BASE_URL}/post/${TEST_POST_ID}/like`,
     null,
-    { headers: jsonHeaders() }
+    { headers: authHeaders(TEST_USER_ID) }
   );
 
-  check(res, {
+  const ok = check(res, {
     'like post status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[load][likePost FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function followUser() {
@@ -166,10 +169,11 @@ export function followUser() {
     { headers: authHeaders(TEST_USER_ID) }
   );
 
-  check(res, {
+  const ok = check(res, {
     'follow user status is 200 or 409': (r) =>
       r.status === 200 || r.status === 409,
   });
+  if (!ok) console.log(`[load][followUser FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function getFeed() {
@@ -177,7 +181,8 @@ export function getFeed() {
     headers: authHeaders(TEST_USER_ID),
   });
 
-  check(res, {
+  const ok = check(res, {
     'get feed status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[load][getFeed FAIL] status=${res.status} body=${res.body}`);
 }

@@ -15,6 +15,7 @@ export function createTokenAuthorizer(api: any, fnProps: any) {
   const authorizerFn = new NodejsFunction(api, 'AuthorizerFn', {
     ...fnProps,
     entry: tokenAuthorizerEntry,
+    bundling: { forceDockerBundling: false },
   });
 
   return new TokenAuthorizer(api, 'TokenAuthorizer', {

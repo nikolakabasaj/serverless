@@ -11,43 +11,57 @@ import {
   randomUsername,
 } from './helpers/utils.js';
 
-export const options = {
-  scenarios: {
-    volumeUserSignup: {
-      executor: 'constant-vus',
-      exec: 'userSignup',
-      vus: 40,
-      duration: '15m',
-    },
+const SCENARIO = __ENV.SCENARIO;
 
-    volumePostCreate: {
-      executor: 'constant-vus',
-      exec: 'createPost',
-      vus: 20,
-      duration: '10m',
-    },
-
-    volumeLikePost: {
-      executor: 'constant-vus',
-      exec: 'likePost',
-      vus: 20,
-      duration: '10m',
-    },
-
-    volumeFollow: {
-      executor: 'constant-vus',
-      exec: 'followUser',
-      vus: 17,
-      duration: '10m',
-    },
-
-    volumeFeed: {
-      executor: 'constant-vus',
-      exec: 'getFeed',
-      vus: 20,
-      duration: '10m',
-    },
+const allScenarios = {
+  volumeUserSignup: {
+    executor: 'constant-vus',
+    exec: 'userSignup',
+    vus: 40,
+    duration: '15m',
   },
+  volumePostCreate: {
+    executor: 'constant-vus',
+    exec: 'createPost',
+    vus: 20,
+    duration: '10m',
+  },
+  volumeLikePost: {
+    executor: 'constant-vus',
+    exec: 'likePost',
+    vus: 20,
+    duration: '10m',
+  },
+  volumeFollow: {
+    executor: 'constant-vus',
+    exec: 'followUser',
+    vus: 17,
+    duration: '10m',
+  },
+  volumeFeed: {
+    executor: 'constant-vus',
+    exec: 'getFeed',
+    vus: 20,
+    duration: '10m',
+  },
+};
+
+const scenarioMap = {
+  signup: 'volumeUserSignup',
+  post: 'volumePostCreate',
+  like: 'volumeLikePost',
+  follow: 'volumeFollow',
+  feed: 'volumeFeed',
+};
+
+function getScenarios() {
+  if (!SCENARIO) return allScenarios;
+  const key = scenarioMap[SCENARIO];
+  return key ? { [key]: allScenarios[key] } : allScenarios;
+}
+
+export const options = {
+  scenarios: getScenarios(),
 };
 
 export function userSignup() {
@@ -62,9 +76,10 @@ export function userSignup() {
     headers: jsonHeaders(),
   });
 
-  check(res, {
+  const ok = check(res, {
     'signup status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[volume][signup FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function createPost() {
@@ -77,21 +92,23 @@ export function createPost() {
     headers: authHeaders(TEST_USER_ID),
   });
 
-  check(res, {
+  const ok = check(res, {
     'create post status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[volume][createPost FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function likePost() {
   const res = http.post(
     `${BASE_URL}/post/${TEST_POST_ID}/like`,
     null,
-    { headers: jsonHeaders() }
+    { headers: authHeaders(TEST_USER_ID) }
   );
 
-  check(res, {
+  const ok = check(res, {
     'like post status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[volume][likePost FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function followUser() {
@@ -101,10 +118,11 @@ export function followUser() {
     { headers: authHeaders(TEST_USER_ID) }
   );
 
-  check(res, {
+  const ok = check(res, {
     'follow user status is 200 or 409': (r) =>
       r.status === 200 || r.status === 409,
   });
+  if (!ok) console.log(`[volume][followUser FAIL] status=${res.status} body=${res.body}`);
 }
 
 export function getFeed() {
@@ -112,7 +130,8 @@ export function getFeed() {
     headers: authHeaders(TEST_USER_ID),
   });
 
-  check(res, {
+  const ok = check(res, {
     'get feed status is 200': (r) => r.status === 200,
   });
+  if (!ok) console.log(`[volume][getFeed FAIL] status=${res.status} body=${res.body}`);
 }
